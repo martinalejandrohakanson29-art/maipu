@@ -17,8 +17,31 @@ import {
 import { DISCIPLINES, NEWS } from './constants';
 import ContactForm from './components/ContactForm';
 import Modal from './components/Modal';
+import AdminPanel from './components/AdminPanel'; // IMPORTAMOS EL NUEVO PANEL
 
 export default function App() {
+  // Lógica para detectar si estamos en la vista de administrador o en la web normal
+  const [currentView, setCurrentView] = useState(() => {
+    return window.location.hash === '#admin' ? 'admin' : 'home';
+  });
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentView(window.location.hash === '#admin' ? 'admin' : 'home');
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Si estamos en la ruta /#admin, mostramos únicamente el panel de control
+  if (currentView === 'admin') {
+    return <AdminPanel />;
+  }
+
+  // =========================================================================
+  // AQUÍ COMIENZA EL CÓDIGO ORIGINAL DE TU WEB - TODO SE MANTIENE EXACTAMENTE IGUAL
+  // =========================================================================
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSocioModalOpen, setIsSocioModalOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -486,4 +509,3 @@ export default function App() {
     </div>
   );
 }
-
