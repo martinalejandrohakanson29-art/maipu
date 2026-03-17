@@ -1,9 +1,54 @@
 import React, { useState } from 'react';
 import { Settings, Image as ImageIcon, FileText, Users, Newspaper, ArrowLeft, Save, Plus, Edit2, Trash2 } from 'lucide-react';
+// Importamos los datos iniciales
 import { DISCIPLINES, NEWS } from '../constants';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('general');
+
+  // --- NUEVO: ESTADOS PARA DISCIPLINAS ---
+  // Convertimos la lista estática en un estado modificable
+  const [disciplinas, setDisciplinas] = useState(DISCIPLINES);
+  
+  // Estado para saber cuál disciplina estamos editando (guardamos su ID)
+  const [editingId, setEditingId] = useState<string | null>(null);
+  
+  // Estado para guardar los datos temporales mientras escribimos en el formulario de edición
+  const [editForm, setEditForm] = useState({ name: '', image: '' });
+
+  // --- FUNCIONES PARA DISCIPLINAS ---
+  
+  // Función para eliminar
+  const handleEliminarDisciplina = (id: string) => {
+    // Preguntamos al usuario si está seguro
+    const confirmar = window.confirm('¿Estás seguro de que deseas eliminar esta disciplina?');
+    if (confirmar) {
+      // Filtramos la lista para quedarnos con todas MENOS la que tiene el id a eliminar
+      const nuevaLista = disciplinas.filter(disciplina => disciplina.id !== id);
+      setDisciplinas(nuevaLista);
+    }
+  };
+
+  // Función para preparar la edición
+  const handleIniciarEdicion = (disciplina: any) => {
+    setEditingId(disciplina.id); // Le decimos a React: "Estamos editando esta tarjeta"
+    setEditForm({ name: disciplina.name, image: disciplina.image }); // Cargamos los datos actuales
+  };
+
+  // Función para guardar los cambios de la edición
+  const handleGuardarEdicion = () => {
+    // Recorremos la lista y actualizamos solo la que coincide con el ID que estamos editando
+    const listaActualizada = disciplinas.map(disciplina => {
+      if (disciplina.id === editingId) {
+        return { ...disciplina, name: editForm.name, image: editForm.image };
+      }
+      return disciplina;
+    });
+    
+    setDisciplinas(listaActualizada); // Guardamos la nueva lista
+    setEditingId(null); // Cerramos el modo edición
+  };
+
 
   // Función para volver a la página web principal
   const handleVolver = () => {
@@ -55,7 +100,6 @@ export default function AdminPanel() {
 
       {/* Contenido Principal */}
       <main className="flex-1 h-screen overflow-y-auto">
-        {/* Cabecera del admin */}
         <header className="bg-white px-8 py-6 shadow-sm flex items-center justify-between sticky top-0 z-0">
           <h1 className="font-display text-2xl font-bold text-maipu-green capitalize">
             Gestionar {activeTab}
@@ -68,7 +112,6 @@ export default function AdminPanel() {
           </div>
         </header>
 
-        {/* Formularios según la pestaña activa */}
         <div className="p-8">
           
           {/* PESTAÑA: INFORMACIÓN GENERAL */}
@@ -125,18 +168,67 @@ export default function AdminPanel() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {DISCIPLINES.map(disciplina => (
-                  <div key={disciplina.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden group">
-                    <div className="h-40 overflow-hidden relative">
-                      <img src={disciplina.image} alt={disciplina.name} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                        <button className="w-10 h-10 bg-white text-maipu-green rounded-full flex items-center justify-center hover:scale-110 transition-transform"><Edit2 size={18} /></button>
-                        <button className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform"><Trash2 size={18} /></button>
+                {/* Aquí cambiamos DISCIPLINES por "disciplinas" (en minúscula) 
+                  para usar nuestra lista "viva" en lugar de la estática
+                */}
+                {disciplinas.map(disciplina => (
+                  <div key={disciplina.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    
+                    {/* Si estamos editando ESTA tarjeta en particular, mostramos el formulario */}
+                    {editingId === disciplina.id ? (
+                      <div className="p-4 flex flex-col gap-3 h-full justify-center bg-slate-50">
+                        <div>
+                          <label className="text-xs font-bold text-slate-500 uppercase">Nombre</label>
+                          <input 
+                            type="text" 
+                            value={editForm.name}
+                            onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                            className="w-full rounded text-sm border-slate-300 mt-1"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-slate-500 uppercase">URL de Imagen</label>
+                          <input 
+                            type="text" 
+                            value={editForm.image}
+                            onChange={(e) => setEditForm({...editForm, image: e.target.value})}
+                            className="w-full rounded text-sm border-slate-300 mt-1"
+                          />
+                        </div>
+                        <div className="flex gap-2 mt-2">
+                          <button onClick={handleGuardarEdicion} className="flex-1 bg-maipu-green text-white py-2 rounded font-bold text-sm hover:bg-maipu-accent">Guardar</button>
+                          <button onClick={() => setEditingId(null)} className="flex-1 bg-slate-200 text-slate-700 py-2 rounded font-bold text-sm hover:bg-slate-300">Cancelar</button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-display font-bold text-xl text-maipu-green">{disciplina.name}</h3>
-                    </div>
+                    ) : (
+                      /* Si NO la estamos editando, mostramos la tarjeta normal */
+                      <>
+                        <div className="h-40 overflow-hidden relative group">
+                          <img src={disciplina.image} alt={disciplina.name} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                            {/* Botón Editar */}
+                            <button 
+                              onClick={() => handleIniciarEdicion(disciplina)}
+                              className="w-10 h-10 bg-white text-maipu-green rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+                              title="Editar"
+                            >
+                              <Edit2 size={18} />
+                            </button>
+                            {/* Botón Eliminar */}
+                            <button 
+                              onClick={() => handleEliminarDisciplina(disciplina.id)}
+                              className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+                              title="Eliminar"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <h3 className="font-display font-bold text-xl text-maipu-green">{disciplina.name}</h3>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
