@@ -26,7 +26,7 @@ export default function App() {
     return <AdminPanel />;
   }
 
-  // --- LEEMOS LOS DATOS DINÁMICOS CON PROTECCIÓN ---
+  // --- LEEMOS LOS DATOS DINÁMICOS CON LAS ESTADÍSTICAS ---
   const [generalInfo] = useState(() => {
     const saved = localStorage.getItem('maipu_general');
     const defaultInfo = {
@@ -37,7 +37,11 @@ export default function App() {
       direccion: "Av. General Paz 1234, Maipú, Mendoza",
       telefono: "+54 0261 4XX-XXXX",
       horarioLV: "Lunes a Viernes: 16:00 a 21:00 hs",
-      horarioS: "Sábados: 09:00 a 13:00 hs"
+      horarioS: "Sábados: 09:00 a 13:00 hs",
+      sociosActivos: "+1500",
+      titulosGanados: "42",
+      anosHistoria: "67",
+      disciplinasTotal: "12"
     };
     if (saved) {
       return { ...defaultInfo, ...JSON.parse(saved) };
@@ -117,10 +121,10 @@ export default function App() {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {[
-                { icon: Users, label: 'Socios Activos', value: '+1500' },
-                { icon: Trophy, label: 'Títulos Ganados', value: '42' },
-                { icon: Calendar, label: 'Años de Historia', value: '67' },
-                { icon: CheckCircle2, label: 'Disciplinas', value: disciplinas.length.toString() },
+                { icon: Users, label: 'Socios Activos', value: generalInfo.sociosActivos },
+                { icon: Trophy, label: 'Títulos Ganados', value: generalInfo.titulosGanados },
+                { icon: Calendar, label: 'Años de Historia', value: generalInfo.anosHistoria },
+                { icon: CheckCircle2, label: 'Disciplinas', value: generalInfo.disciplinasTotal },
               ].map((stat, i) => (
                 <div key={i} className="text-center">
                   <stat.icon className="mx-auto text-maipu-light-green mb-2" size={32} />
@@ -169,6 +173,69 @@ export default function App() {
                   </div>
                 </motion.article>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Membership Section */}
+        <section className="py-24 bg-maipu-green text-white relative overflow-hidden" id="socios">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-maipu-light-green/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="flex flex-col lg:flex-row items-center gap-20">
+              <div className="lg:w-1/2">
+                <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+                  <h2 className="font-display text-5xl md:text-6xl font-bold mb-8">
+                    SÉ PARTE DE LA <br/><span className="text-maipu-light-green">FAMILIA VERDE</span>
+                  </h2>
+                  <p className="text-xl text-slate-200 mb-10 leading-relaxed">
+                    Ser socio es mucho más que pagar una cuota. Es apoyar el crecimiento de los chicos del barrio, cuidar nuestra historia y disfrutar de beneficios exclusivos en nuestra sede.
+                  </p>
+                  <ul className="space-y-6 mb-12">
+                    {[
+                      'Acceso preferencial a instalaciones y salones.',
+                      'Descuentos en cuotas de todas las disciplinas.',
+                      'Beneficios en comercios adheridos de la zona.',
+                      'Participación activa en la vida social del club.'
+                    ].map((benefit, i) => (
+                      <li key={i} className="flex items-center gap-4 text-lg">
+                        <div className="bg-maipu-light-green/20 p-1.5 rounded-full"><CheckCircle2 className="text-maipu-light-green" size={24} /></div>
+                        {benefit}
+                      </li>
+                    ))}
+                  </ul>
+                  <button onClick={() => setIsSocioModalOpen(true)} className="bg-white text-maipu-green px-12 py-5 rounded-full font-bold text-xl hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95">
+                    ¡HACETE SOCIO AHORA!
+                  </button>
+                </motion.div>
+              </div>
+              
+              <div className="lg:w-1/2">
+                <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative">
+                  <div className="bg-white p-10 rounded-3xl shadow-2xl text-maipu-green rotate-3 max-w-md mx-auto relative z-20">
+                    <div className="flex justify-between items-start mb-12">
+                      <div className="w-12 h-12 bg-maipu-green rounded-lg flex items-center justify-center text-white font-display font-bold text-2xl">M</div>
+                      <span className="font-bold text-xs bg-maipu-light-green text-white px-4 py-1.5 rounded-full tracking-widest uppercase">SOCIO ACTIVO</span>
+                    </div>
+                    <div className="space-y-6">
+                      <div className="h-4 bg-slate-100 rounded-full w-3/4"></div>
+                      <div className="h-4 bg-slate-100 rounded-full w-1/2"></div>
+                      <div className="pt-12 flex items-center gap-5">
+                        <div className="h-16 w-16 bg-slate-200 rounded-2xl"></div>
+                        <div className="space-y-3">
+                          <div className="h-3 bg-slate-100 rounded-full w-32"></div>
+                          <div className="h-3 bg-slate-100 rounded-full w-20"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -bottom-8 -left-8 bg-maipu-light-green p-8 rounded-2xl text-white shadow-2xl -rotate-6 z-30">
+                    <p className="font-display font-bold text-4xl mb-1">{generalInfo.anosHistoria} AÑOS</p>
+                    <p className="text-sm font-semibold opacity-90 uppercase tracking-wider">Cuidando el deporte barrial</p>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </div>
         </section>
