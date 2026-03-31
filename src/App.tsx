@@ -26,10 +26,10 @@ export default function App() {
     return <AdminPanel />;
   }
 
-  // --- LEEMOS LOS DATOS DINÁMICOS ---
+  // --- LEEMOS LOS DATOS DINÁMICOS CON PROTECCIÓN ---
   const [generalInfo] = useState(() => {
     const saved = localStorage.getItem('maipu_general');
-    return saved ? JSON.parse(saved) : {
+    const defaultInfo = {
       titulo: "CLUB MAIPÚ",
       subtitulo: "ORGULLO DE BARRIO",
       descripcion: "Forjando comunidad, valores y pasión deportiva desde 1957.",
@@ -39,6 +39,10 @@ export default function App() {
       horarioLV: "Lunes a Viernes: 16:00 a 21:00 hs",
       horarioS: "Sábados: 09:00 a 13:00 hs"
     };
+    if (saved) {
+      return { ...defaultInfo, ...JSON.parse(saved) };
+    }
+    return defaultInfo;
   });
 
   const [disciplinas] = useState(() => {
@@ -169,7 +173,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* Visitanos (NUEVO: AHORA DINÁMICO) */}
+        {/* Visitanos */}
         <section className="py-24 bg-white" id="contacto">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
