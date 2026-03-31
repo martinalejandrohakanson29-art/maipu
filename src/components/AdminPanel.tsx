@@ -5,10 +5,12 @@ import { DISCIPLINES, NEWS } from '../constants';
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('general');
 
-  // --- 1. ESTADOS PARA INFORMACIÓN GENERAL Y CONTACTO ---
+  // --- 1. ESTADOS PARA INFORMACIÓN GENERAL Y CONTACTO (CON PROTECCIÓN DE MEMORIA) ---
   const [generalInfo, setGeneralInfo] = useState(() => {
     const saved = localStorage.getItem('maipu_general');
-    return saved ? JSON.parse(saved) : {
+    
+    // Estos son los datos base. Si la memoria está vacía o le faltan campos, usará estos:
+    const defaultInfo = {
       titulo: "CLUB MAIPÚ",
       subtitulo: "ORGULLO DE BARRIO",
       descripcion: "Forjando comunidad, valores y pasión deportiva desde 1957.",
@@ -18,6 +20,12 @@ export default function AdminPanel() {
       horarioLV: "Lunes a Viernes: 16:00 a 21:00 hs",
       horarioS: "Sábados: 09:00 a 13:00 hs"
     };
+
+    if (saved) {
+      // "Mezclamos" los datos por defecto con los que ya guardaste para que no falte ninguno
+      return { ...defaultInfo, ...JSON.parse(saved) };
+    }
+    return defaultInfo;
   });
 
   const handleGuardarCambios = (mensaje: string) => {
@@ -148,7 +156,7 @@ export default function AdminPanel() {
                     <label className="block text-sm font-medium text-slate-600 mb-1">Título Principal</label>
                     <input 
                       type="text" 
-                      value={generalInfo.titulo} 
+                      value={generalInfo.titulo || ''} 
                       onChange={(e) => setGeneralInfo({...generalInfo, titulo: e.target.value})}
                       className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" 
                     />
@@ -157,7 +165,7 @@ export default function AdminPanel() {
                     <label className="block text-sm font-medium text-slate-600 mb-1">Subtítulo (Verde)</label>
                     <input 
                       type="text" 
-                      value={generalInfo.subtitulo} 
+                      value={generalInfo.subtitulo || ''} 
                       onChange={(e) => setGeneralInfo({...generalInfo, subtitulo: e.target.value})}
                       className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" 
                     />
@@ -165,7 +173,7 @@ export default function AdminPanel() {
                   <div>
                     <label className="block text-sm font-medium text-slate-600 mb-1">Descripción corta</label>
                     <textarea 
-                      value={generalInfo.descripcion} 
+                      value={generalInfo.descripcion || ''} 
                       onChange={(e) => setGeneralInfo({...generalInfo, descripcion: e.target.value})}
                       rows={2} 
                       className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green"
@@ -179,7 +187,7 @@ export default function AdminPanel() {
                 </div>
               </div>
 
-              {/* Datos de Contacto (NUEVA SECCIÓN) */}
+              {/* Datos de Contacto */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><MapPin className="text-maipu-light-green" size={20}/> Datos de Contacto y Visitas</h2>
                 <div className="space-y-4">
@@ -187,7 +195,7 @@ export default function AdminPanel() {
                     <label className="block text-sm font-medium text-slate-600 mb-1">Dirección Completa</label>
                     <input 
                       type="text" 
-                      value={generalInfo.direccion} 
+                      value={generalInfo.direccion || ''} 
                       onChange={(e) => setGeneralInfo({...generalInfo, direccion: e.target.value})}
                       className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" 
                     />
@@ -196,7 +204,7 @@ export default function AdminPanel() {
                     <label className="block text-sm font-medium text-slate-600 mb-1">Teléfono</label>
                     <input 
                       type="text" 
-                      value={generalInfo.telefono} 
+                      value={generalInfo.telefono || ''} 
                       onChange={(e) => setGeneralInfo({...generalInfo, telefono: e.target.value})}
                       className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" 
                     />
@@ -206,7 +214,7 @@ export default function AdminPanel() {
                       <label className="block text-sm font-medium text-slate-600 mb-1">Horario Lun a Vie</label>
                       <input 
                         type="text" 
-                        value={generalInfo.horarioLV} 
+                        value={generalInfo.horarioLV || ''} 
                         onChange={(e) => setGeneralInfo({...generalInfo, horarioLV: e.target.value})}
                         className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" 
                       />
@@ -215,7 +223,7 @@ export default function AdminPanel() {
                       <label className="block text-sm font-medium text-slate-600 mb-1">Horario Sábados</label>
                       <input 
                         type="text" 
-                        value={generalInfo.horarioS} 
+                        value={generalInfo.horarioS || ''} 
                         onChange={(e) => setGeneralInfo({...generalInfo, horarioS: e.target.value})}
                         className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" 
                       />
@@ -237,7 +245,7 @@ export default function AdminPanel() {
                     <label className="block text-sm font-medium text-slate-600 mb-1">URL Imagen de Fondo</label>
                     <input 
                       type="text" 
-                      value={generalInfo.imagenFondo} 
+                      value={generalInfo.imagenFondo || ''} 
                       onChange={(e) => setGeneralInfo({...generalInfo, imagenFondo: e.target.value})}
                       className="w-full rounded-lg border-slate-300 text-slate-500 font-mono text-sm" 
                     />
