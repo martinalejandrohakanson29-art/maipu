@@ -160,7 +160,7 @@ export default function App() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
               {noticias.map((item: any, index: number) => (
                 <motion.article key={item.id} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: index * 0.1 }} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200 group">
-                  <div className="overflow-hidden h-56"><img alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" src={item.image} /></div>
+                  <div className="overflow-hidden h-56"><img alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" src={item.image} referrerPolicy="no-referrer" /></div>
                   <div className="p-8">
                     <span className="text-xs font-bold text-maipu-light-green uppercase">{item.category}</span>
                     <h3 className="text-2xl font-bold mt-3 mb-4 text-maipu-green">{item.title}</h3>
