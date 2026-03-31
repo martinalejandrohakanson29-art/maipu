@@ -1,29 +1,28 @@
 import React, { useState } from 'react';
-import { Settings, Image as ImageIcon, FileText, Users, Newspaper, ArrowLeft, Save, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Settings, Image as ImageIcon, FileText, Users, Newspaper, ArrowLeft, Save, Plus, Edit2, Trash2, MapPin } from 'lucide-react';
 import { DISCIPLINES, NEWS } from '../constants';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('general');
 
-  // --- 1. ESTADOS PARA INFORMACIÓN GENERAL ---
+  // --- 1. ESTADOS PARA INFORMACIÓN GENERAL Y CONTACTO ---
   const [generalInfo, setGeneralInfo] = useState(() => {
     const saved = localStorage.getItem('maipu_general');
     return saved ? JSON.parse(saved) : {
       titulo: "CLUB MAIPÚ",
       subtitulo: "ORGULLO DE BARRIO",
       descripcion: "Forjando comunidad, valores y pasión deportiva desde 1957.",
-      imagenFondo: "https://images.unsplash.com/photo-1504450758481-7338eba7524a?auto=format&fit=crop&q=80&w=1920"
+      imagenFondo: "https://images.unsplash.com/photo-1504450758481-7338eba7524a?auto=format&fit=crop&q=80&w=1920",
+      direccion: "Av. General Paz 1234, Maipú, Mendoza",
+      telefono: "+54 0261 4XX-XXXX",
+      horarioLV: "Lunes a Viernes: 16:00 a 21:00 hs",
+      horarioS: "Sábados: 09:00 a 13:00 hs"
     };
   });
 
-  const handleGuardarGeneral = () => {
+  const handleGuardarCambios = (mensaje: string) => {
     localStorage.setItem('maipu_general', JSON.stringify(generalInfo));
-    alert('¡Cambios de textos guardados con éxito!');
-  };
-
-  const handleGuardarImagen = () => {
-    localStorage.setItem('maipu_general', JSON.stringify(generalInfo));
-    alert('¡Imagen guardada con éxito!');
+    alert(mensaje);
   };
 
   // --- 2. ESTADOS PARA DISCIPLINAS ---
@@ -80,14 +79,13 @@ export default function AdminPanel() {
     alert('Esta función estará disponible próximamente.');
   };
 
-  // Función para volver
   const handleVolver = () => {
     window.location.hash = '';
   };
 
   return (
     <div className="min-h-screen bg-slate-100 flex selection:bg-maipu-light-green selection:text-white">
-      {/* Menú Lateral */}
+      {/* Sidebar */}
       <aside className="w-64 bg-maipu-accent text-white flex flex-col shadow-xl z-10">
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-3 mb-2">
@@ -128,25 +126,21 @@ export default function AdminPanel() {
         </div>
       </aside>
 
-      {/* Contenido Principal */}
+      {/* Main Content */}
       <main className="flex-1 h-screen overflow-y-auto">
         <header className="bg-white px-8 py-6 shadow-sm flex items-center justify-between sticky top-0 z-0">
           <h1 className="font-display text-2xl font-bold text-maipu-green capitalize">
             Gestionar {activeTab}
           </h1>
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-slate-500">Próximamente: Login de Usuarios</span>
-            <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold">
-              AD
-            </div>
+            <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold">AD</div>
           </div>
         </header>
 
         <div className="p-8">
-          
-          {/* PESTAÑA: INFORMACIÓN GENERAL */}
           {activeTab === 'general' && (
             <div className="max-w-3xl space-y-6">
+              {/* Textos Principales */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><FileText className="text-maipu-light-green" size={20}/> Textos de la Portada</h2>
                 <div className="space-y-4">
@@ -179,17 +173,68 @@ export default function AdminPanel() {
                   </div>
                 </div>
                 <div className="mt-6 flex justify-end">
-                  <button onClick={handleGuardarGeneral} className="flex items-center gap-2 bg-maipu-green text-white px-6 py-2.5 rounded-lg font-bold hover:bg-maipu-accent transition-colors">
-                    <Save size={18} /> Guardar Cambios
+                  <button onClick={() => handleGuardarCambios('¡Textos de portada guardados!')} className="flex items-center gap-2 bg-maipu-green text-white px-6 py-2.5 rounded-lg font-bold hover:bg-maipu-accent transition-colors">
+                    <Save size={18} /> Guardar Textos
                   </button>
                 </div>
               </div>
 
+              {/* Datos de Contacto (NUEVA SECCIÓN) */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><ImageIcon className="text-maipu-light-green" size={20}/> Imágenes Generales</h2>
+                <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><MapPin className="text-maipu-light-green" size={20}/> Datos de Contacto y Visitas</h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-600 mb-1">URL Imagen de Fondo (Portada)</label>
+                    <label className="block text-sm font-medium text-slate-600 mb-1">Dirección Completa</label>
+                    <input 
+                      type="text" 
+                      value={generalInfo.direccion} 
+                      onChange={(e) => setGeneralInfo({...generalInfo, direccion: e.target.value})}
+                      className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 mb-1">Teléfono</label>
+                    <input 
+                      type="text" 
+                      value={generalInfo.telefono} 
+                      onChange={(e) => setGeneralInfo({...generalInfo, telefono: e.target.value})}
+                      className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" 
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-600 mb-1">Horario Lun a Vie</label>
+                      <input 
+                        type="text" 
+                        value={generalInfo.horarioLV} 
+                        onChange={(e) => setGeneralInfo({...generalInfo, horarioLV: e.target.value})}
+                        className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-600 mb-1">Horario Sábados</label>
+                      <input 
+                        type="text" 
+                        value={generalInfo.horarioS} 
+                        onChange={(e) => setGeneralInfo({...generalInfo, horarioS: e.target.value})}
+                        className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" 
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end">
+                  <button onClick={() => handleGuardarCambios('¡Datos de contacto guardados!')} className="flex items-center gap-2 bg-maipu-green text-white px-6 py-2.5 rounded-lg font-bold hover:bg-maipu-accent transition-colors">
+                    <Save size={18} /> Guardar Contacto
+                  </button>
+                </div>
+              </div>
+
+              {/* Imagen de Fondo */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><ImageIcon className="text-maipu-light-green" size={20}/> Imagen de Portada</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 mb-1">URL Imagen de Fondo</label>
                     <input 
                       type="text" 
                       value={generalInfo.imagenFondo} 
@@ -199,19 +244,19 @@ export default function AdminPanel() {
                   </div>
                 </div>
                 <div className="mt-6 flex justify-end">
-                  <button onClick={handleGuardarImagen} className="flex items-center gap-2 bg-maipu-green text-white px-6 py-2.5 rounded-lg font-bold hover:bg-maipu-accent transition-colors">
-                    <Save size={18} /> Guardar Imágenes
+                  <button onClick={() => handleGuardarCambios('¡Imagen de fondo guardada!')} className="flex items-center gap-2 bg-maipu-green text-white px-6 py-2.5 rounded-lg font-bold hover:bg-maipu-accent transition-colors">
+                    <Save size={18} /> Guardar Imagen
                   </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* PESTAÑA: DISCIPLINAS */}
+          {/* Disciplinas */}
           {activeTab === 'disciplinas' && (
             <div className="space-y-6">
               <div className="flex justify-between items-center mb-6">
-                <p className="text-slate-600">Aquí podrás agregar, editar o eliminar los deportes del club.</p>
+                <p className="text-slate-600">Gestiona los deportes del club.</p>
                 <button onClick={funcionEnDesarrollo} className="flex items-center gap-2 bg-maipu-green text-white px-4 py-2 rounded-lg font-bold hover:bg-maipu-accent transition-colors shadow-md">
                   <Plus size={18} /> Nueva Disciplina
                 </button>
@@ -222,27 +267,11 @@ export default function AdminPanel() {
                   <div key={disciplina.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     {editingId === disciplina.id ? (
                       <div className="p-4 flex flex-col gap-3 h-full justify-center bg-slate-50">
-                        <div>
-                          <label className="text-xs font-bold text-slate-500 uppercase">Nombre</label>
-                          <input 
-                            type="text" 
-                            value={editForm.name}
-                            onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                            className="w-full rounded text-sm border-slate-300 mt-1"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs font-bold text-slate-500 uppercase">URL de Imagen</label>
-                          <input 
-                            type="text" 
-                            value={editForm.image}
-                            onChange={(e) => setEditForm({...editForm, image: e.target.value})}
-                            className="w-full rounded text-sm border-slate-300 mt-1"
-                          />
-                        </div>
-                        <div className="flex gap-2 mt-2">
-                          <button onClick={handleGuardarEdicion} className="flex-1 bg-maipu-green text-white py-2 rounded font-bold text-sm hover:bg-maipu-accent">Guardar</button>
-                          <button onClick={() => setEditingId(null)} className="flex-1 bg-slate-200 text-slate-700 py-2 rounded font-bold text-sm hover:bg-slate-300">Cancelar</button>
+                        <input type="text" value={editForm.name} onChange={(e) => setEditForm({...editForm, name: e.target.value})} className="w-full rounded text-sm border-slate-300" placeholder="Nombre"/>
+                        <input type="text" value={editForm.image} onChange={(e) => setEditForm({...editForm, image: e.target.value})} className="w-full rounded text-sm border-slate-300" placeholder="URL Imagen"/>
+                        <div className="flex gap-2">
+                          <button onClick={handleGuardarEdicion} className="flex-1 bg-maipu-green text-white py-2 rounded font-bold text-sm">Guardar</button>
+                          <button onClick={() => setEditingId(null)} className="flex-1 bg-slate-200 text-slate-700 py-2 rounded font-bold text-sm">Cancelar</button>
                         </div>
                       </div>
                     ) : (
@@ -250,24 +279,12 @@ export default function AdminPanel() {
                         <div className="h-40 overflow-hidden relative group">
                           <img src={disciplina.image} alt={disciplina.name} className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                            <button 
-                              onClick={() => handleIniciarEdicion(disciplina)}
-                              className="w-10 h-10 bg-white text-maipu-green rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-                              title="Editar"
-                            >
-                              <Edit2 size={18} />
-                            </button>
-                            <button 
-                              onClick={() => handleEliminarDisciplina(disciplina.id)}
-                              className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-                              title="Eliminar"
-                            >
-                              <Trash2 size={18} />
-                            </button>
+                            <button onClick={() => handleIniciarEdicion(disciplina)} className="w-10 h-10 bg-white text-maipu-green rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"><Edit2 size={18} /></button>
+                            <button onClick={() => handleEliminarDisciplina(disciplina.id)} className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"><Trash2 size={18} /></button>
                           </div>
                         </div>
-                        <div className="p-4">
-                          <h3 className="font-display font-bold text-xl text-maipu-green">{disciplina.name}</h3>
+                        <div className="p-4 text-center">
+                          <h3 className="font-display font-bold text-xl text-maipu-green uppercase">{disciplina.name}</h3>
                         </div>
                       </>
                     )}
@@ -277,11 +294,11 @@ export default function AdminPanel() {
             </div>
           )}
 
-          {/* PESTAÑA: NOTICIAS */}
+          {/* Noticias */}
           {activeTab === 'noticias' && (
             <div className="space-y-6">
               <div className="flex justify-between items-center mb-6">
-                <p className="text-slate-600">Administra las novedades, torneos y comunicados.</p>
+                <p className="text-slate-600">Administra las novedades y comunicados.</p>
                 <button onClick={funcionEnDesarrollo} className="flex items-center gap-2 bg-maipu-green text-white px-4 py-2 rounded-lg font-bold hover:bg-maipu-accent transition-colors shadow-md">
                   <Plus size={18} /> Publicar Noticia
                 </button>
@@ -289,26 +306,24 @@ export default function AdminPanel() {
 
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <table className="w-full text-left">
-                  <thead className="bg-slate-50 border-b border-slate-200">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase">
                     <tr>
-                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Fecha</th>
-                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Categoría</th>
-                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Título</th>
-                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Acciones</th>
+                      <th className="px-6 py-4">Fecha</th>
+                      <th className="px-6 py-4">Categoría</th>
+                      <th className="px-6 py-4">Título</th>
+                      <th className="px-6 py-4 text-right">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {noticias.map((noticia: any) => (
-                      <tr key={noticia.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{noticia.date}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-3 py-1 bg-maipu-light-green/10 text-maipu-green font-bold text-xs rounded-full">{noticia.category}</span>
-                        </td>
-                        <td className="px-6 py-4 text-sm font-medium text-slate-800">{noticia.title}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex items-center justify-end gap-2">
-                            <button onClick={funcionEnDesarrollo} className="p-2 text-slate-400 hover:text-maipu-green hover:bg-slate-100 rounded-lg transition-colors"><Edit2 size={16} /></button>
-                            <button onClick={() => handleEliminarNoticia(noticia.id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16} /></button>
+                      <tr key={noticia.id} className="hover:bg-slate-50 transition-colors text-sm">
+                        <td className="px-6 py-4 text-slate-500">{noticia.date}</td>
+                        <td className="px-6 py-4"><span className="px-3 py-1 bg-maipu-light-green/10 text-maipu-green font-bold text-xs rounded-full">{noticia.category}</span></td>
+                        <td className="px-6 py-4 font-medium text-slate-800">{noticia.title}</td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button onClick={funcionEnDesarrollo} className="p-2 text-slate-400 hover:text-maipu-green"><Edit2 size={16} /></button>
+                            <button onClick={() => handleEliminarNoticia(noticia.id)} className="p-2 text-slate-400 hover:text-red-500"><Trash2 size={16} /></button>
                           </div>
                         </td>
                       </tr>
