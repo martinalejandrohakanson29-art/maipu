@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Settings, Image as ImageIcon, FileText, Users, Newspaper, ArrowLeft, Save, Plus, Edit2, Trash2, MapPin } from 'lucide-react';
+import { Settings, Image as ImageIcon, FileText, Users, Newspaper, ArrowLeft, Save, Plus, Edit2, Trash2, MapPin, Trophy } from 'lucide-react';
 import { DISCIPLINES, NEWS } from '../constants';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('general');
 
-  // --- 1. ESTADOS PARA INFORMACIÓN GENERAL Y CONTACTO ---
+  // --- 1. ESTADOS PARA INFORMACIÓN GENERAL, CONTACTO Y ESTADÍSTICAS ---
   const [generalInfo, setGeneralInfo] = useState(() => {
     const saved = localStorage.getItem('maipu_general');
     const defaultInfo = {
@@ -16,7 +16,12 @@ export default function AdminPanel() {
       direccion: "Av. General Paz 1234, Maipú, Mendoza",
       telefono: "+54 0261 4XX-XXXX",
       horarioLV: "Lunes a Viernes: 16:00 a 21:00 hs",
-      horarioS: "Sábados: 09:00 a 13:00 hs"
+      horarioS: "Sábados: 09:00 a 13:00 hs",
+      // Nuevos campos de estadísticas
+      sociosActivos: "+1500",
+      titulosGanados: "42",
+      anosHistoria: "67",
+      disciplinasTotal: "12"
     };
     return saved ? { ...defaultInfo, ...JSON.parse(saved) } : defaultInfo;
   });
@@ -67,20 +72,16 @@ export default function AdminPanel() {
     return saved ? JSON.parse(saved) : NEWS;
   });
 
-  // Estado para saber qué noticia editamos ('new' para una nueva, o el ID de una existente)
   const [editingNoticiaId, setEditingNoticiaId] = useState<string | null>(null);
-  // Estado para guardar los datos del formulario de la noticia
   const [noticiaForm, setNoticiaForm] = useState({ id: '', title: '', category: '', description: '', date: '', image: '' });
 
   const handleNuevaNoticia = () => {
-    // Preparamos el formulario vacío para una noticia nueva
     const fechaActual = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
     setNoticiaForm({ id: Date.now().toString(), title: '', category: 'Institucional', description: '', date: fechaActual, image: '' });
     setEditingNoticiaId('new');
   };
 
   const handleIniciarEdicionNoticia = (noticia: any) => {
-    // Cargamos los datos de la noticia existente en el formulario
     setNoticiaForm(noticia);
     setEditingNoticiaId(noticia.id);
   };
@@ -88,15 +89,13 @@ export default function AdminPanel() {
   const handleGuardarNoticia = () => {
     let nuevaLista;
     if (editingNoticiaId === 'new') {
-      // Si es nueva, la agregamos al principio de la lista
       nuevaLista = [noticiaForm, ...noticias];
     } else {
-      // Si ya existía, la actualizamos
       nuevaLista = noticias.map((n: any) => n.id === editingNoticiaId ? noticiaForm : n);
     }
     setNoticias(nuevaLista);
     localStorage.setItem('maipu_noticias', JSON.stringify(nuevaLista));
-    setEditingNoticiaId(null); // Cerramos el formulario
+    setEditingNoticiaId(null);
     alert('¡Noticia guardada con éxito!');
   };
 
@@ -155,6 +154,8 @@ export default function AdminPanel() {
           {/* Pestaña: Información General */}
           {activeTab === 'general' && (
             <div className="max-w-3xl space-y-6">
+              
+              {/* Textos Principales */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><FileText className="text-maipu-light-green" size={20}/> Textos de la Portada</h2>
                 <div className="space-y-4">
@@ -176,6 +177,33 @@ export default function AdminPanel() {
                 </div>
               </div>
 
+              {/* Estadísticas del Club (NUEVO) */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><Trophy className="text-maipu-light-green" size={20}/> Estadísticas del Club</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 mb-1">Socios Activos</label>
+                    <input type="text" value={generalInfo.sociosActivos || ''} onChange={(e) => setGeneralInfo({...generalInfo, sociosActivos: e.target.value})} className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 mb-1">Títulos Ganados</label>
+                    <input type="text" value={generalInfo.titulosGanados || ''} onChange={(e) => setGeneralInfo({...generalInfo, titulosGanados: e.target.value})} className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 mb-1">Años de Historia</label>
+                    <input type="text" value={generalInfo.anosHistoria || ''} onChange={(e) => setGeneralInfo({...generalInfo, anosHistoria: e.target.value})} className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 mb-1">Disciplinas (Cantidad)</label>
+                    <input type="text" value={generalInfo.disciplinasTotal || ''} onChange={(e) => setGeneralInfo({...generalInfo, disciplinasTotal: e.target.value})} className="w-full rounded-lg border-slate-300 focus:ring-maipu-green focus:border-maipu-green" />
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end">
+                  <button onClick={() => handleGuardarCambios('¡Estadísticas guardadas!')} className="flex items-center gap-2 bg-maipu-green text-white px-6 py-2.5 rounded-lg font-bold hover:bg-maipu-accent transition-colors"><Save size={18} /> Guardar Estadísticas</button>
+                </div>
+              </div>
+
+              {/* Datos de Contacto */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><MapPin className="text-maipu-light-green" size={20}/> Datos de Contacto y Visitas</h2>
                 <div className="space-y-4">
@@ -203,6 +231,7 @@ export default function AdminPanel() {
                 </div>
               </div>
 
+              {/* Imagen de Fondo */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2"><ImageIcon className="text-maipu-light-green" size={20}/> Imagen de Portada</h2>
                 <div className="space-y-4">
@@ -272,7 +301,6 @@ export default function AdminPanel() {
                 )}
               </div>
 
-              {/* Si estamos editando o creando una noticia, mostramos este formulario */}
               {editingNoticiaId ? (
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                   <h3 className="font-bold text-lg text-maipu-green mb-6 border-b pb-2">
@@ -314,7 +342,6 @@ export default function AdminPanel() {
                   </div>
                 </div>
               ) : (
-                /* Si NO estamos editando, mostramos la tabla normal */
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                   <table className="w-full text-left">
                     <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase">
